@@ -6,11 +6,11 @@ import { useClearCart, useUserCart } from "@/hooks/lib/UseCart";
 import { useCreateOrder } from "@/hooks/lib/UseOrders";
 import { useUpdateStock } from "@/hooks/lib/UseProduct";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Query } from "appwrite";
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
     const { user } = useAuth();
     const searchParams = useSearchParams();
     const sessionId = searchParams.get("session_id");
@@ -186,5 +186,17 @@ export default function OrderSuccessPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function OrderSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="animate-spin text-green-600" size={48} />
+            </div>
+        }>
+            <OrderSuccessContent />
+        </Suspense>
     );
 }

@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMyNursery } from "@/hooks/lib/UseNursery";
-import { useAllProducts, useEditProduct, useDeleteById } from "@/hooks/lib/UseProduct";
+import { useAllProducts, useDeleteProductMutation } from "@/hooks/lib/UseProduct";
+import { useQueryClient } from "@tanstack/react-query";
+import { databases, DATABASE_ID, COLLECTION_ID } from "@/lib/Appwrite.config";
 import {
   Card,
   CardContent,
@@ -15,15 +17,16 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 export default function InventoryPage() {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { data: nursery, isLoading: nurseryLoading } = useMyNursery(user?.$id);
   const { data: allProducts, isLoading: productsLoading } = useAllProducts();
-  const editProduct = useEditProduct();
-  const deleteProduct = useDeleteById();
+  const deleteProduct = useDeleteProductMutation();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Filter products for this nursery
   const myProducts = allProducts?.filter((p: any) => p.nurseryid === nursery?.$id) || [];
@@ -41,28 +44,34 @@ export default function InventoryPage() {
 
   const handleSaveEdit = async () => {
     if (!editingProduct) return;
+    setIsUpdating(true);
 
     try {
-      await editProduct.mutateAsync({
-        id: editingProduct.$id,
-        data: {
+      await databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_ID,
+        editingProduct.$id,
+        {
           name: editingProduct.name,
           desc: editingProduct.desc,
           price: editingProduct.price,
-          stock: editingProduct.stock,
+          stock: parseInt(editingProduct.stock),
           category: editingProduct.category,
           careInstructions: editingProduct.careInstructions,
           climateZone: editingProduct.climateZone,
           season: editingProduct.season,
-          isAvailable: editingProduct.stock > 0,
-        },
-      });
+          isAvailable: parseInt(editingProduct.stock) > 0,
+        }
+      );
       toast.success("Product updated successfully!");
       setShowEditModal(false);
       setEditingProduct(null);
+      queryClient.invalidateQueries({ queryKey: ["all-products"] });
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error("Failed to update product");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -282,10 +291,10 @@ export default function InventoryPage() {
               </button>
               <button
                 onClick={handleSaveEdit}
-                disabled={editProduct.isPending}
+                disabled={isUpdating}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
               >
-                {editProduct.isPending ? "Saving..." : "Save Changes"}
+                {isUpdating ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

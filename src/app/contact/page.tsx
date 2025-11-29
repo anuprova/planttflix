@@ -1,24 +1,27 @@
 "use client";
 import Image from "next/image";
 import aboutusimg from "../../../public/images/banner/contact-banner.jpg";
+import dynamic from 'next/dynamic';
 
 import contactImg from "../../../public/images/about/contact-touch.jpg";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Icon } from "leaflet";
-import "leaflet/dist/leaflet.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Loader2 } from "lucide-react";
 
-const markerIcon = new Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+// Dynamically import the map component with SSR disabled
+const DynamicMap = dynamic(() => import('./MapComponent'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center w-full h-full bg-gray-100">
+      <Loader2 className="animate-spin text-green-600" size={32} />
+    </div>
+  ),
 });
 
 export default function ContactSection() {
   return (
     <>
-    <Navbar/>
+      <Navbar />
       {/* TOP BACKGROUND HERO SECTION */}
       <div className="relative w-full h-[300px] md:h-[400px]">
         <Image
@@ -86,20 +89,7 @@ export default function ContactSection() {
 
           {/* RIGHT — React Leaflet Map */}
           <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow-lg z-0">
-            <MapContainer
-              center={[34.0522, -118.2437]}
-              zoom={13}
-              scrollWheelZoom={false}
-              className="w-full h-full"
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="© OpenStreetMap contributors"
-              />
-              <Marker position={[34.0522, -118.2437]} icon={markerIcon}>
-                <Popup>Los Angeles, California, USA</Popup>
-              </Marker>
-            </MapContainer>
+            <DynamicMap />
           </div>
         </div>
 
@@ -152,7 +142,7 @@ export default function ContactSection() {
        
         </div> */}
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }

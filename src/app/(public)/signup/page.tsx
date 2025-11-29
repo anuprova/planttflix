@@ -8,12 +8,13 @@ import { useRouter } from "next/navigation";
 import loginbg from "../../../../public/images/banner/banner-bg-2.jpg";
 import { useState, useEffect } from "react";
 import { useSignup } from "@/hooks/lib/UseAuth";
+import { SignupData } from "@/hooks/lib/AuthService";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Signup = () => {
   const [image, setImage] = useState<File | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SignupData>({
     name: "",
     email: "",
     phone: "",
@@ -158,10 +159,10 @@ const Signup = () => {
           {/* SUBMIT BUTTON */}
           <button
             type="submit"
-            disabled={signup.isLoading}
+            disabled={signup.isPending}
             className="flex justify-center w-full px-4 py-3 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50"
           >
-            {signup.isLoading ? "Creating account..." : "Sign up"}
+            {signup.isPending ? "Creating account..." : "Sign up"}
           </button>
 
           {/* LOGIN LINK */}

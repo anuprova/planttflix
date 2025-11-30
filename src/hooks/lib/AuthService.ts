@@ -52,7 +52,31 @@ export async function loginService(email: string, password: string) {
   console.log("I am in Login service");
   
   const session = await account.createEmailPasswordSession(email, password);
-  Cookies.set(COOKIE_NAMES.loggedIn, "1", { expires: 7 });
+  
+  // Fetch user role from database
+  try {
+    const profile = await tableDb.listRows({
+      databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+      tableId: "Authenticationtable",
+      queries: [`equal("email", "${email}")`],
+    });
+    
+    const role = profile?.rows?.[0]?.role || "User";
+    
+    // Set all required cookies for middleware
+    Cookies.set(COOKIE_NAMES.loggedIn, "1", { expires: 7 });
+    Cookies.set(COOKIE_NAMES.session, session.$id, { expires: 7 });
+    Cookies.set(COOKIE_NAMES.role, role, { expires: 7 });
+    
+    console.log("Login cookies set - Role:", role, "Session:", session.$id);
+  } catch (error) {
+    console.error("Error fetching user role:", error);
+    // Set default cookies even if role fetch fails
+    Cookies.set(COOKIE_NAMES.loggedIn, "1", { expires: 7 });
+    Cookies.set(COOKIE_NAMES.session, session.$id, { expires: 7 });
+    Cookies.set(COOKIE_NAMES.role, "User", { expires: 7 });
+  }
+  
   return session;
 }
 

@@ -10,6 +10,7 @@ import {
   useUpdateCartQuantity,
   useRemoveFromCart,
 } from "@/hooks/lib/UseCart";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const router = useRouter();
@@ -100,11 +101,11 @@ export default function CartPage() {
         window.location.href = data.url;
       } else {
         console.error("Stripe Checkout Error:", data.error);
-        alert("Checkout failed. Please try again.");
+       toast.error("Checkout failed. Please try again.");
       }
     } catch (error) {
       console.error("Checkout Request Error:", error);
-      alert("An error occurred. Please try again.");
+       toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

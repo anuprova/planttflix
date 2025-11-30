@@ -33,7 +33,7 @@ export const useSuperAdminStats = () => {
           const { tableDb } = await import("@/lib/Appwrite.config");
           const users = await tableDb.listRows({
               databaseId: DATABASE_ID,
-              tableId: "authenticationtable",
+              tableId: "Authenticationtable",
               queries: [Query.limit(1)]
           });
           totalUsers = users.total;
@@ -61,7 +61,7 @@ export const useAllUsers = () => {
             const { tableDb } = await import("@/lib/Appwrite.config");
             const response = await tableDb.listRows({
                 databaseId: DATABASE_ID,
-                tableId: "authenticationtable",
+                tableId: "Authenticationtable",
                 queries: [Query.limit(100)]
             });
             return response;
@@ -77,7 +77,7 @@ export const useUpdateUserRole = () => {
             const { tableDb } = await import("@/lib/Appwrite.config");
             const response = await tableDb.updateRow({
                 databaseId: DATABASE_ID,
-                tableId: "authenticationtable",
+                tableId: "Authenticationtable",
                 rowId: rowId,
                 data: { role: newRole }
             });
@@ -97,7 +97,7 @@ export const useDeleteUser = () => {
             const { tableDb } = await import("@/lib/Appwrite.config");
             const response = await tableDb.deleteRow({
                 databaseId: DATABASE_ID,
-                tableId: "authenticationtable",
+                tableId: "Authenticationtable",
                 rowId: rowId
             });
             return response;
@@ -116,7 +116,7 @@ export const useUpdateUser = () => {
             const { tableDb } = await import("@/lib/Appwrite.config");
             const response = await tableDb.updateRow({
                 databaseId: DATABASE_ID,
-                tableId: "authenticationtable",
+                tableId: "Authenticationtable",
                 rowId: rowId,
                 data: data
             });

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { databases, DATABASE_ID, NURSERIES_COLLECTION_ID } from "@/lib/Appwrite.config";
 import { Query } from "appwrite";
+import { toast } from "sonner";
 
 type ProductForm = {
   name: string;
@@ -60,7 +61,7 @@ export default function AddProduct() {
         );
 
         if (response.documents.length === 0) {
-          alert("No nursery found for your account. Please contact admin.");
+          toast.error("No nursery found for your account. Please contact admin.");
           router.push("/nurseryadmin");
           return;
         }
@@ -68,7 +69,7 @@ export default function AddProduct() {
         setNurseryId(response.documents[0].$id);
       } catch (error) {
         console.error("Error fetching nursery:", error);
-        alert("Error loading nursery information");
+       toast.error("Error loading nursery information");
       } finally {
         setLoadingNursery(false);
       }
@@ -107,7 +108,7 @@ export default function AddProduct() {
 
     mutate(productData, {
       onSuccess: () => {
-        alert("Product added successfully!");
+        toast.success("Product added successfully!");
         router.push("/shop");
       },
       onError: (err) => {

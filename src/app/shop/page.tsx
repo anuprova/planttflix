@@ -72,7 +72,7 @@ export default function ShopDesignOnly() {
               </select>
 
               <select className="border border-gray-300 p-2 rounded-md">
-                <option>Show: 9</option>
+                <option>Show: 6</option>
               </select>
             </div>
           </div>

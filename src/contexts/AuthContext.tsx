@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Try to fetch role from database
                 const profile = await tableDb.listRows({
                     databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-                    tableId: "authenticationtable",
+                    tableId: "Authenticationtable",
                     queries: [Query.equal("email", accountData.email)],
                 });
 

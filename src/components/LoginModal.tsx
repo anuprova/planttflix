@@ -2,7 +2,7 @@
 
 import { X, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type LoginModalProps = {
     isOpen: boolean;
@@ -11,30 +11,30 @@ type LoginModalProps = {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const router = useRouter();
-    const [visible, setVisible] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
-    useEffect(() => {
-        if (isOpen) {
-            setVisible(true);
-        } else {
-            setTimeout(() => setVisible(false), 300); // Wait for animation
-        }
-    }, [isOpen]);
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsClosing(false);
+            onClose();
+        }, 300);
+    };
 
-    if (!visible && !isOpen) return null;
+    if (!isOpen && !isClosing) return null;
 
     return (
         <div
             className={`
         fixed inset-0 z-[100] flex items-center justify-center 
         transition-opacity duration-300
-        ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}
+        ${isOpen && !isClosing ? "opacity-100" : "opacity-0 pointer-events-none"}
       `}
         >
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-                onClick={onClose}
+                onClick={handleClose}
             />
 
             {/* Modal Content */}
@@ -42,11 +42,11 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 className={`
           relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4
           transform transition-all duration-300
-          ${isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}
+          ${isOpen && !isClosing ? "scale-100 translate-y-0" : "scale-95 translate-y-4"}
         `}
             >
                 <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                     <X className="w-5 h-5" />
@@ -67,7 +67,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
                     <div className="flex gap-3 w-full">
                         <button
-                            onClick={onClose}
+                            onClick={handleClose}
                             className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
                         >
                             Cancel

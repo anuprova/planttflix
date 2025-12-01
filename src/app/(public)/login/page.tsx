@@ -29,7 +29,7 @@ const Login = () => {
       } else if (role === "nurseryadmin") {
         router.push("/nurseryadmin");
       } else {
-        router.push("/user");
+        router.push("/user/dashboard");
       }
     }
   }, [user, authLoading, router]);

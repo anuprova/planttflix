@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import { useNurseryOrders } from "@/hooks/lib/UseOrders";
 import { useAllProducts } from "@/hooks/lib/UseProduct";
 import { useMyNursery } from "@/hooks/lib/UseNursery";
@@ -14,7 +15,15 @@ import {
 import { Loader2 } from "lucide-react";
 
 export default function NurseryAdminDashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  // Client-side protection
+  useEffect(() => {
+    if (!loading && (!user || user.role?.toLowerCase() !== "nurseryadmin")) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
   // 1. Fetch Nursery Details first
   const { data: nursery, isLoading: nurseryLoading } = useMyNursery(user?.$id);
@@ -138,7 +147,7 @@ export default function NurseryAdminDashboard() {
                         ₹{order.totalAmount}
                       </span>
                       <span className={`text-[10px] px-2 py-1 rounded-full uppercase font-bold ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                          order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                        order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                         }`}>
                         {order.status}
                       </span>

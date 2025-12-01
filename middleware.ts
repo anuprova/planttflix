@@ -30,13 +30,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("session")?.value || null;
+  const token = request.cookies.get("app_session")?.value || null;
   const role = request.cookies.get("role")?.value || null;
 
   const { pathname } = request.nextUrl;
 
   console.log("Middleware Role:", role);
   console.log("Middleware Token:", token);
+  console.log("Middleware Path:", pathname);
+
+  // Normalize role to lowercase for comparison
+  const normalizedRole = role?.toLowerCase();
 
   // --------------------------------------
   // 1️⃣ UNAUTHENTICATED USERS
@@ -52,33 +56,46 @@ export function middleware(request: NextRequest) {
   }
 
   // --------------------------------------
-  // 2️⃣ AUTHENTICATED USER REDIRECT LOGIC
+  // 2️⃣ AUTHENTICATED USERS - Redirect from login/signup pages
+  // --------------------------------------
+  if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
+    // User is already logged in, redirect to their dashboard
+    if (normalizedRole === "superadmin") {
+      return NextResponse.redirect(new URL("/superadmin", request.url));
+    } else if (normalizedRole === "nurseryadmin") {
+      return NextResponse.redirect(new URL("/nurseryadmin", request.url));
+    } else {
+      return NextResponse.redirect(new URL("/user/dashboard", request.url));
+    }
+  }
+
+  // --------------------------------------
+  // 3️⃣ AUTHENTICATED USER ROLE-BASED ACCESS CONTROL
   // --------------------------------------
 
-  // If User logs in → take them to /shop
-  if (role === "user") {
+  // If User logs in → prevent access to admin routes
+  if (normalizedRole === "user") {
     if (pathname.startsWith("/superadmin") || pathname.startsWith("/nurseryadmin")) {
-      return NextResponse.redirect(new URL("/shop", request.url));
+      return NextResponse.redirect(new URL("/user/dashboard", request.url));
     }
     return NextResponse.next();
   }
 
-  // If NurseryAdmin logs in → take them to nurseryadmin dashboard
-  if (role === "nurseryadmin") {
+  // If NurseryAdmin logs in → prevent access to superadmin routes
+  if (normalizedRole === "nurseryadmin") {
     if (pathname.startsWith("/superadmin")) {
       // Nursery admin cannot access superadmin pages
-      return NextResponse.redirect(new URL("/nurseryadmin/dashboard", request.url));
+      return NextResponse.redirect(new URL("/nurseryadmin", request.url));
     }
     return NextResponse.next();
   }
 
-  // If SuperAdmin logs in → take them to superadmin dashboard
-  if (role === "superadmin") {
-    // superadmin should not be forced into nurseryadmin-only pages
+  // If SuperAdmin logs in → allow access to all routes
+  if (normalizedRole === "superadmin") {
     return NextResponse.next();
   }
 
-  // If role is unknown
+  // If role is unknown or invalid
   return NextResponse.redirect(new URL("/login", request.url));
 }
 
@@ -86,6 +103,9 @@ export const config = {
   matcher: [
     "/nurseryadmin/:path*",
     "/superadmin/:path*",
+    "/user/:path*",
     "/dashboard/:path*",
+    "/login",
+    "/signup",
   ],
 };

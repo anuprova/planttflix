@@ -84,14 +84,16 @@ export function useLogin() {
 // -----------------------------
 export function useLogout() {
   const qc = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: () => logoutService(),
 
     onSuccess: async () => {
+      console.log("Logout successful, clearing cache and redirecting...");
       await qc.invalidateQueries({ queryKey: ["currentUser"] });
-      router.push("/login");
+      qc.clear(); // Clear all cached data
+      // Use window.location for hard redirect to ensure clean state
+      window.location.href = "/login";
     },
   });
 }

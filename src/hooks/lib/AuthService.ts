@@ -81,12 +81,17 @@ export async function loginService(email: string, password: string) {
 }
 
 export async function logoutService() {
+  console.log("Logout service: Starting logout...");
   try {
     await account.deleteSession("current");
+    console.log("Logout service: Session deleted successfully");
+  } catch (error) {
+    console.error("Logout service: Error deleting session:", error);
   } finally {
     Cookies.remove(COOKIE_NAMES.loggedIn);
     Cookies.remove(COOKIE_NAMES.session);
     Cookies.remove(COOKIE_NAMES.role);
+    console.log("Logout service: Cookies cleared");
   }
 }
 

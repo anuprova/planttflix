@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 
 export default function UserDashboard() {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const { data: userProfile, isLoading: profileLoading } = useUserProfile(user?.email);
     const { data: ordersData, isLoading: ordersLoading } = useUserOrders(user?.$id);
     const updateProfile = useUpdateUserProfile();
@@ -118,7 +118,19 @@ export default function UserDashboard() {
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
-                <h1 className="text-3xl font-bold text-gray-800">👤 My Dashboard</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold text-gray-800">👤 My Dashboard</h1>
+                    <button
+                        onClick={() => {
+                            if (confirm("Are you sure you want to logout?")) {
+                                logout();
+                            }
+                        }}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition"
+                    >
+                        Logout
+                    </button>
+                </div>
 
                 {/* Profile Card */}
                 <Card>

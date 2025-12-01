@@ -63,8 +63,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 role,
             });
             console.log("AuthContext: User set successfully");
-        } catch (error) {
-            console.log("AuthContext: No user logged in or error:", error);
+        } catch (error: any) {
+            // Only log if it's not a 401 (expected for guests)
+            if (error?.code !== 401) {
+                console.log("AuthContext: Unexpected error:", error);
+            }
             setUser(null);
         } finally {
             setLoading(false);
@@ -96,10 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 role,
             });
 
-            // Redirect based on role
-            if (role === "superadmin") {
+            // Redirect based on role (case-insensitive)
+            const normalizedRole = role.toLowerCase();
+            if (normalizedRole === "superadmin") {
                 router.push("/superadmin");
-            } else if (role === "nurseryadmin") {
+            } else if (normalizedRole === "nurseryadmin") {
                 router.push("/nurseryadmin");
             } else {
                 router.push("/user/dashboard");

@@ -19,10 +19,21 @@ import {
   Cell
 } from "recharts";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function SuperAdminDashboard() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const { data: stats, isLoading } = useSuperAdminStats();
   const [chartData, setChartData] = useState<any[]>([]);
+
+  // Client-side protection
+  useEffect(() => {
+    if (!loading && (!user || user.role?.toLowerCase() !== "superadmin")) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (stats && stats.recentOrders) {
@@ -125,7 +136,7 @@ export default function SuperAdminDashboard() {
                   <div className="text-right">
                     <p className="font-bold text-green-700">₹{order.totalAmount}</p>
                     <span className={`text-[10px] px-2 py-1 rounded-full uppercase font-bold ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                       }`}>
                       {order.status}
                     </span>

@@ -2,27 +2,15 @@
 
 import { useLogout } from "@/hooks/lib/UseAuth";
 import { useState } from "react";
-// import { logoutUser } from "@/lib/logout";
-import { useRouter } from "next/navigation";
 
 export default function LogoutButton() {
   const [open, setOpen] = useState(false);
-  const router = useRouter()
-
-    const logout = useLogout();
-//   const router = useRouter();
-
-
+  const logout = useLogout();
 
   const handleLogout = () => {
-    logout.mutate()
-    setOpen(false)
-    if (logout) {
-      router.push("/");
-    }
+    setOpen(false);
+    logout.mutate();
   };
-
-  
 
   return (
     <>

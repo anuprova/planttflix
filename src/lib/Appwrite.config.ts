@@ -21,6 +21,7 @@ export const ORDERS_COLLECTION_ID = "orders" // Orders
 export const ORDER_ITEMS_COLLECTION_ID = "orderItems" // Order items
 export const COMMISSION_SETTINGS_COLLECTION_ID = "commissionSettings" // Commission settings
 export const REVIEWS_COLLECTION_ID = "reviews" // Product reviews (optional)
+export const CONTACT_SUBMISSIONS_COLLECTION_ID = "contactSubmissions" // Contact form submissions
 
 export const BUCKET_ID = "691def7e0017221d1bea";
 export {ID, client}

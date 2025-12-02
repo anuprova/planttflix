@@ -129,7 +129,7 @@ export default function Home() {
     },
   ];
 
- const router = useRouter();
+  const router = useRouter();
 
   const goToShop = () => {
     router.push("/shop");
@@ -369,103 +369,108 @@ export default function Home() {
 
         {/* Service section  start*/}
 
-        <section className="w-full bg-gradient-to-br from-green-200 via-white to-green-100 py-12">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3 text-green-600 dark:text-white">
+        <section className="w-full bg-gradient-to-br from-green-200 via-white to-green-100 py-12 overflow-hidden">
+          <div className="text-center mb-12 px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-green-600 dark:text-white">
               OUR SERVICES
             </h2>
-            <p className=" text-l text-gray-600 dark:text-gray-300 mb-8 ">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
               We provide high-quality gardening & exterior services tailored to
               your needs.
             </p>
           </div>
 
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 ">
-            {/* LEFT */}
-            <div className="flex justify-center items-center">
-              <div className="space-y-8">
-                {services.map((s, i) => (
-                  <div key={i} className="flex items-center gap-8 ">
-                    {/* simple icon circle (replace with <Image /> if desired) */}
-                    <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center ">
-                      {s.icon && (
-                        <s.icon className="w-50 h-50 text-green-600 " />
-                      )}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+              {/* LEFT - Services List */}
+              <div className="flex justify-center items-center order-2 lg:order-1">
+                <div className="space-y-6 sm:space-y-8 w-full">
+                  {services.map((s, i) => (
+                    <div key={i} className="flex items-start gap-4 sm:gap-6">
+                      {/* Icon circle */}
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                        {s.icon && (
+                          <s.icon className="w-6 h-6 sm:w-7 sm:h-7 text-green-600" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-green-900 dark:text-white mb-1">
+                          {s.title}
+                        </h3>
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                          {s.desc}
+                        </p>
+                      </div>
                     </div>
-
-                    <div>
-                      <h3 className="text-2xl font-semibold text-green-900 dark:text-white">
-                        {s.title}
-                      </h3>
-                      <p className="text-lg text-gray-600 dark:text-gray-300 w-100">
-                        {s.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT - inline YouTube with poster + play overlay */}
-            <div className="relative w-full h-[320px] md:h-[420px] rounded-xl overflow-hidden shadow-lg bg-black">
-              {!isPlaying ? (
-                // Poster thumbnail with play button overlay
-                <div
-                  className="w-full h-full relative cursor-pointer"
-                  role="button"
-                  aria-label="Play video"
-                  onClick={() => setIsPlaying(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") setIsPlaying(true);
-                  }}
-                  tabIndex={0}
-                >
-                  {/* Poster image */}
-                  <Image
-                    src={serviceposter}
-                    alt="Video poster"
-                    className="w-full h-full object-cover"
-                  />
-
-                  {/* dark overlay for better contrast */}
-                  <div className="absolute inset-0 bg-black/30" />
-
-                  {/* Play button */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-white/90 flex items-center justify-center shadow-lg transform transition-transform hover:scale-105"
-                      aria-hidden
-                    >
-                      {/* simple play icon */}
-                      <svg
-                        className="w-10 h-10 text-green-600 ml-1"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M5 3.868v16.264A1 1 0 0 0 6.537 21.6L19.5 12.999 6.537 2.4A1 1 0 0 0 5 3.868z" />
-                      </svg>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ) : (
-                // iframe player (autoplay enabled via query params)
-                <iframe
-                  className="w-full h-full"
-                  src={embedUrl}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay"
-                  allowFullScreen
-                />
-              )}
+              </div>
+
+              {/* RIGHT - Video Player */}
+              <div className="order-1 lg:order-2">
+                <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg bg-black max-w-2xl mx-auto lg:max-w-none">
+                  {!isPlaying ? (
+                    // Poster thumbnail with play button overlay
+                    <div
+                      className="w-full h-full relative cursor-pointer"
+                      role="button"
+                      aria-label="Play video"
+                      onClick={() => setIsPlaying(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setIsPlaying(true);
+                      }}
+                      tabIndex={0}
+                    >
+                      {/* Poster image */}
+                      <Image
+                        src={serviceposter}
+                        alt="Video poster"
+                        fill
+                        className="object-cover"
+                      />
+
+                      {/* dark overlay for better contrast */}
+                      <div className="absolute inset-0 bg-black/30" />
+
+                      {/* Play button */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div
+                          className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-white/90 flex items-center justify-center shadow-lg transform transition-transform hover:scale-105"
+                          aria-hidden
+                        >
+                          {/* simple play icon */}
+                          <svg
+                            className="w-8 h-8 sm:w-10 sm:h-10 text-green-600 ml-1"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M5 3.868v16.264A1 1 0 0 0 6.537 21.6L19.5 12.999 6.537 2.4A1 1 0 0 0 5 3.868z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // iframe player (autoplay enabled via query params)
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={embedUrl}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; autoplay"
+                      allowFullScreen
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
         {/* Service section  end*/}
 
         {/* category section */}
-       
+
         <section className="w-full bg-gradient-to-br from-green-700 via-white to-green-100 py-16">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12 text-green-900 tracking-wide drop-shadow-sm">
@@ -485,7 +490,7 @@ export default function Home() {
                       alt={cat.title}
                       width={300}
                       height={300}
-                      className=" w-full h-full object-cover  transition-all duration-500   group-hover:scale-110 group-hover:opacity-90"/>
+                      className=" w-full h-full object-cover  transition-all duration-500   group-hover:scale-110 group-hover:opacity-90" />
                   </div>
 
                   {/* TITLE */}
@@ -495,7 +500,7 @@ export default function Home() {
 
                   {/* VIEW CATEGORY BUTTON */}
                   <button
-                   onClick={goToShop}
+                    onClick={goToShop}
                     className="
               px-6 
               py-2.5 

@@ -2,11 +2,12 @@
 import Image from "next/image";
 import aboutusimg from "../../../public/images/banner/contact-banner.jpg";
 import dynamic from 'next/dynamic';
-
-import contactImg from "../../../public/images/about/contact-touch.jpg";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useSubmitContactForm } from "@/hooks/lib/UseContact";
+import { toast } from "sonner";
 
 // Dynamically import the map component with SSR disabled
 const DynamicMap = dynamic(() => import('./MapComponent'), {
@@ -19,6 +20,49 @@ const DynamicMap = dynamic(() => import('./MapComponent'), {
 });
 
 export default function ContactSection() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const { mutate: submitForm, isPending } = useSubmitContactForm();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    submitForm(formData, {
+      onSuccess: () => {
+        toast.success("Message sent successfully! We'll get back to you soon.");
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      },
+      onError: (error: any) => {
+        console.error("Contact form error:", error);
+        toast.error("Failed to send message. Please try again.");
+      },
+    });
+  };
+
   return (
     <>
       <Navbar />
@@ -37,9 +81,14 @@ export default function ContactSection() {
 
         {/* Center Text */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
-            Contact
-          </h1>
+          <div className="text-center px-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-4">
+              Contact
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+              We'd love to hear from you! Reach out to us for any questions or inquiries
+            </p>
+          </div>
         </div>
       </div>
 
@@ -52,37 +101,55 @@ export default function ContactSection() {
               Send us a message, we will call back later
             </p>
 
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   placeholder="Your Name"
                   className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="Your Email"
                   className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
                 />
               </div>
 
               <input
                 type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
                 placeholder="Subject"
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+                required
               />
 
               <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
                 placeholder="Message"
                 rows={6}
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+                required
               ></textarea>
 
               <button
                 type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-md shadow"
+                disabled={isPending}
+                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                SEND MESSAGE
+                {isPending && <Loader2 className="animate-spin" size={18} />}
+                {isPending ? "SENDING..." : "SEND MESSAGE"}
               </button>
             </form>
           </div>
@@ -92,55 +159,6 @@ export default function ContactSection() {
             <DynamicMap />
           </div>
         </div>
-
-        {/* <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-12 flex items-center">
-          <div className="w-full h-[350px] md:h-[450px] relative rounded-2xl shadow-lg overflow-hidden">
-            <Image
-              src={contactImg}
-              alt="Contact Us"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-
-          <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              CONTACT US
-            </h2>
-            <p className="text-gray-600 mb-8">
-              We are improving our services to serve you better.
-            </p>
-
-            <div className="space-y-4 text-gray-700">
-              <p>
-                <span className="font-semibold">Address:</span> 505 Silk Rd, New
-                York
-              </p>
-
-              <p>
-                <span className="font-semibold">Phone:</span> +1 234 122 122
-              </p>
-
-              <p>
-                <span className="font-semibold">Email:</span>{" "}
-                info.deercreative@gmail.com
-              </p>
-
-              <p>
-                <span className="font-semibold">Open hours:</span> Mon – Sun: 8
-                AM to 9 PM
-              </p>
-
-              <p>
-                <span className="font-semibold">Happy hours:</span> Sat: 2 PM to
-                4 PM
-              </p>
-            </div>
-          </div>
-
-       
-        </div> */}
       </div>
       <Footer />
     </>

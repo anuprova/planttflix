@@ -34,7 +34,7 @@ export default function AboutSection() {
 
   return (
     <>
-    <Navbar/>
+      <Navbar />
       {/* TOP BACKGROUND HERO SECTION */}
       <div className="relative w-full h-[300px] md:h-[400px]">
         <Image
@@ -50,9 +50,14 @@ export default function AboutSection() {
 
         {/* Center Text */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
-            About
-          </h1>
+          <div className="text-center px-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-4">
+              About
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+              Discover our passion for bringing nature closer to you through quality plants and exceptional service
+            </p>
+          </div>
         </div>
       </div>
 
@@ -100,7 +105,7 @@ export default function AboutSection() {
           </div>
         </div>
       </section>
-      <Footer/>
+      <Footer />
     </>
   );
 }

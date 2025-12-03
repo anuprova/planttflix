@@ -138,7 +138,7 @@ export default function UserOrdersPage() {
                                         <div className="text-right">
                                             <p className="text-sm text-gray-500">Total Amount</p>
                                             <p className="text-2xl font-bold text-gray-900">
-                                                ₹{order.total_amount?.toLocaleString()}
+                                                ₹{(order.totalAmount || order.total_amount || order.amount || 0).toLocaleString()}
                                             </p>
                                         </div>
 
@@ -172,7 +172,7 @@ export default function UserOrdersPage() {
                                             </h4>
                                             <div className="bg-white rounded-lg p-4 border border-gray-200">
                                                 <p className="text-gray-700">
-                                                    {order.shipping_address || "No address provided"}
+                                                    {order.shippingAddress || order.shipping_address || order.address || "No address provided"}
                                                 </p>
                                             </div>
                                         </div>

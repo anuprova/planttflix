@@ -176,18 +176,23 @@ export default function UserDashboard() {
                                                 {order.status}
                                             </span>
                                         </div>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-sm text-gray-500 mb-1">
                                             {new Date(order.$createdAt).toLocaleDateString("en-US", {
                                                 year: "numeric",
                                                 month: "long",
                                                 day: "numeric",
                                             })}
                                         </p>
+                                        {(order.shippingAddress || order.shipping_address || order.address) && (
+                                            <p className="text-xs text-gray-400 truncate max-w-md" title={order.shippingAddress || order.shipping_address || order.address}>
+                                                📍 {order.shippingAddress || order.shipping_address || order.address}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <div className="text-right">
                                             <p className="text-lg font-bold text-gray-900">
-                                                ₹{order.total_amount?.toLocaleString()}
+                                                ₹{(order.totalAmount || order.total_amount || order.amount || 0).toLocaleString()}
                                             </p>
                                         </div>
                                         <Link

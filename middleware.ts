@@ -13,20 +13,34 @@ export function middleware(request: NextRequest) {
 
     console.log(`[Middleware] Token exists: ${!!token}, Role: ${role || "none"}`);
 
-    // Public routes that don't need authentication
+    // Public routes that don't need any middleware checks
     const publicRoutes = ["/", "/about", "/contact", "/shop"];
     const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith("/shop/"));
+    
+    // Auth pages - special handling
     const isAuthPage = pathname === "/login" || pathname === "/signup";
 
-    // If user is logged in and trying to access auth pages, redirect to appropriate dashboard
-    if (token && isAuthPage) {
-      console.log(`[Middleware] Logged in user accessing auth page, redirecting to dashboard`);
-      const dashboardPath = role?.toLowerCase() === "superadmin" 
-        ? "/superadmin" 
-        : role?.toLowerCase() === "nurseryadmin"
-        ? "/nurseryadmin"
-        : "/user/dashboard";
-      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    // Allow auth pages to complete their flow without interference
+    if (isAuthPage) {
+      // Only redirect if user is already logged in
+      if (token && role) {
+        console.log(`[Middleware] Logged in user accessing auth page, redirecting to dashboard`);
+        const dashboardPath = role?.toLowerCase() === "superadmin" 
+          ? "/superadmin" 
+          : role?.toLowerCase() === "nurseryadmin"
+          ? "/nurseryadmin"
+          : "/user/dashboard";
+        return NextResponse.redirect(new URL(dashboardPath, request.url));
+      }
+      // Let unauthenticated users access login/signup pages
+      console.log(`[Middleware] Allowing access to auth page`);
+      return NextResponse.next();
+    }
+
+    // Allow public routes without any checks
+    if (isPublicRoute) {
+      console.log(`[Middleware] Public route, allowing access`);
+      return NextResponse.next();
     }
 
     // Protected routes for unauthenticated users
@@ -38,8 +52,8 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Role-based access control
-    if (token && role) {
+    // Role-based access control (only if user is authenticated)
+    if (token && role && isProtectedRoute) {
       const normalizedRole = role.toLowerCase();
       
       // Superadmin routes

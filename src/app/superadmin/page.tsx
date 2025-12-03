@@ -1,6 +1,7 @@
 "use client";
 import { useSuperAdminStats } from "@/hooks/lib/UseSuperAdmin";
 import { Loader2, TrendingUp, Users, Store, ShoppingBag, DollarSign, Package } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,7 @@ export default function SuperAdminDashboard() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-green-600" size={48} />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

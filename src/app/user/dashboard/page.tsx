@@ -2,8 +2,9 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserOrders } from "@/hooks/lib/UseUserOrders";
-import { Package, ShoppingBag, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import { Package, ShoppingBag, Clock, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function UserDashboard() {
     const { user } = useAuth();
@@ -142,7 +143,7 @@ export default function UserDashboard() {
 
                 {isLoading ? (
                     <div className="p-12 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+                        <LoadingSpinner size="lg" />
                     </div>
                 ) : recentOrders.length === 0 ? (
                     <div className="p-12 text-center">

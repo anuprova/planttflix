@@ -11,12 +11,12 @@ import {
   Package,
   TrendingUp,
   AlertTriangle,
-  Loader2,
   DollarSign,
   ChevronRight,
   Store
 } from "lucide-react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function NurseryAdminDashboard() {
   const { user, loading } = useAuth();
@@ -73,7 +73,7 @@ export default function NurseryAdminDashboard() {
   if (nurseryLoading || ordersLoading || productsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-green-600" size={48} />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

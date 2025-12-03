@@ -9,12 +9,12 @@ import {
     ChevronDown,
     ChevronUp,
     XCircle,
-    Loader2,
     Calendar,
     MapPin,
     CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function UserOrdersPage() {
     const { user } = useAuth();
@@ -57,7 +57,7 @@ export default function UserOrdersPage() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+                <LoadingSpinner size="lg" />
             </div>
         );
     }

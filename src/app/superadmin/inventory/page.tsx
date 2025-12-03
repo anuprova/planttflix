@@ -118,9 +118,10 @@ export default function GlobalInventoryPage() {
                 />
             </div>
 
-            <Card className="shadow-md overflow-hidden">
+            <Card className="shadow-md overflow-hidden bg-transparent border-0 sm:bg-white sm:border">
                 <CardContent className="p-0">
-                    <div className="overflow-x-auto">
+                    {/* Desktop/Tablet Table View */}
+                    <div className="hidden md:block overflow-x-auto bg-white rounded-lg border">
                         <table className="w-full">
                             <thead className="bg-gray-50 border-b">
                                 <tr>
@@ -170,13 +171,73 @@ export default function GlobalInventoryPage() {
                                 ))}
                             </tbody>
                         </table>
-                        {filteredProducts.length === 0 && (
-                            <div className="p-12 text-center flex flex-col items-center justify-center text-gray-500">
-                                <Package size={48} className="mb-4 text-gray-300" />
-                                <p>No products found.</p>
-                            </div>
-                        )}
                     </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-4">
+                        {filteredProducts.map((product: any) => (
+                            <div key={product.$id} className="bg-white p-4 rounded-xl border shadow-sm space-y-4">
+                                {/* Header: Image + Name + Price */}
+                                <div className="flex items-start gap-4">
+                                    <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                        <Image src={product.imageurl} alt={product.name} fill className="object-cover" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start">
+                                            <h3 className="font-semibold text-gray-800 truncate pr-2">{product.name}</h3>
+                                            <p className="font-bold text-gray-900">₹{product.price}</p>
+                                        </div>
+                                        <p className="text-xs text-gray-500 line-clamp-2 mt-1">{product.desc}</p>
+                                    </div>
+                                </div>
+
+                                {/* Details Grid */}
+                                <div className="grid grid-cols-2 gap-3 text-sm border-t border-b py-3 border-gray-100">
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Category</p>
+                                        <p className="text-gray-700 font-medium">{product.category}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Season</p>
+                                        <p className="text-gray-700 font-medium">{product.season || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Stock</p>
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold inline-block mt-0.5 ${product.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                            {product.stock} units
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-500 text-xs">Nursery</p>
+                                        <p className="text-gray-700 font-medium truncate">{nurseryMap.get(product.nurseryid) || "Unknown"}</p>
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => openEditModal(product)}
+                                        className="flex-1 flex items-center justify-center gap-2 p-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium"
+                                    >
+                                        <Pencil size={14} /> Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(product.$id, product.name)}
+                                        className="flex-1 flex items-center justify-center gap-2 p-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium"
+                                    >
+                                        <Trash2 size={14} /> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {filteredProducts.length === 0 && (
+                        <div className="p-12 text-center flex flex-col items-center justify-center text-gray-500">
+                            <Package size={48} className="mb-4 text-gray-300" />
+                            <p>No products found.</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

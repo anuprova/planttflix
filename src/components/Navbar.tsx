@@ -13,12 +13,11 @@ import {
   User,
   LayoutDashboard,
 } from "lucide-react";
-import { account } from "@/lib/Appwrite.config";
+import { useAuth } from "@/contexts/AuthContext";
 import { useUserCart } from "@/hooks/lib/UseCart";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, logout } = useAuth();
   const { data: cartItems = [] } = useUserCart(user?.$id || null);
   const totalQty = cartItems.reduce((s, it) => s + (it.quantity || 0), 0);
 
@@ -28,39 +27,6 @@ export default function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-
-  // Check user on mount
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    try {
-      const accountData = await account.get();
-
-      // Try to fetch role from Authenticationtable
-      try {
-        const { tableDb } = await import("@/lib/Appwrite.config");
-        const { Query } = await import("appwrite");
-
-        const profile = await tableDb.listRows({
-          databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-          tableId: "Authenticationtable",
-          queries: [Query.equal("email", accountData.email)],
-        });
-
-        const role = profile?.rows?.[0]?.role || "User";
-        setUser({ ...accountData, role });
-      } catch (roleError) {
-        console.warn("Could not fetch role:", roleError);
-        setUser({ ...accountData, role: "User" });
-      }
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Top menu items
   const menuItems = [
@@ -95,13 +61,7 @@ export default function Navbar() {
   // Logout handler
   async function handleLogout() {
     if (!confirm("Are you sure you want to logout?")) return;
-    try {
-      await account.deleteSession("current");
-      setUser(null);
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    await logout();
   }
 
   // Get display name

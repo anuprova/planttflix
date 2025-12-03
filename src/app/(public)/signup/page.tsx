@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useSignup } from "@/hooks/lib/UseAuth";
 import { SignupData } from "@/hooks/lib/AuthService";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -51,7 +52,19 @@ const Signup = () => {
     console.log("form data: ", formData);
 
     signup.mutate(
-      { formData, image } // send both formData + image
+      { formData, image },
+      {
+        onSuccess: () => {
+          console.log("Signup success! Redirecting to login...");
+          toast.success("Account created successfully! Please login.");
+          // Use window.location.href for a hard redirect to ensure clean state
+          window.location.href = "/login";
+        },
+        onError: (error: any) => {
+          console.error("Signup error:", error);
+          toast.error(error.message || "Failed to create account");
+        }
+      }
     );
   };
 

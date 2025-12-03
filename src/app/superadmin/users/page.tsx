@@ -118,9 +118,10 @@ export default function UserManagementPage() {
         />
       </div>
 
-      <Card className="shadow-md overflow-hidden">
+      <Card className="shadow-md overflow-hidden bg-transparent border-0 sm:bg-white sm:border">
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          {/* Desktop/Tablet Table View */}
+          <div className="hidden md:block overflow-x-auto bg-white rounded-lg border">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
@@ -151,8 +152,8 @@ export default function UserManagementPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${user.role === 'SuperAdmin' ? 'bg-red-100 text-red-700' :
-                          user.role === 'NurseryAdmin' ? 'bg-blue-100 text-blue-700' :
-                            'bg-gray-100 text-gray-700'
+                        user.role === 'NurseryAdmin' ? 'bg-blue-100 text-blue-700' :
+                          'bg-gray-100 text-gray-700'
                         }`}>
                         {user.role || 'User'}
                       </span>
@@ -177,8 +178,8 @@ export default function UserManagementPage() {
                             onClick={() => handleRoleUpdate(user.$id, user.role, user.name)}
                             disabled={updateRole.isPending}
                             className={`p-2 rounded-lg transition ${user.role === 'NurseryAdmin'
-                                ? 'hover:bg-orange-50 text-orange-600'
-                                : 'hover:bg-green-50 text-green-600'
+                              ? 'hover:bg-orange-50 text-orange-600'
+                              : 'hover:bg-green-50 text-green-600'
                               }`}
                             title={user.role === 'NurseryAdmin' ? "Demote to User" : "Promote to Nursery Admin"}
                           >
@@ -203,12 +204,89 @@ export default function UserManagementPage() {
                 ))}
               </tbody>
             </table>
-            {filteredUsers.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                No users found matching your search.
-              </div>
-            )}
           </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {filteredUsers.map((user: any) => (
+              <div key={user.$id} className="bg-white p-4 rounded-xl border shadow-sm space-y-4">
+                {/* Header: Avatar + Name + Role */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${user.role === 'SuperAdmin' ? 'bg-red-100 text-red-700' :
+                    user.role === 'NurseryAdmin' ? 'bg-blue-100 text-blue-700' :
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                    {user.role || 'User'}
+                  </span>
+                </div>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-2 gap-3 text-sm border-t border-b py-3 border-gray-100">
+                  <div>
+                    <p className="text-gray-500 text-xs">Phone</p>
+                    <p className="text-gray-700 font-medium">{user.phone || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Joined</p>
+                    <p className="text-gray-700 font-medium">{new Date(user.$createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-500 text-xs">Address</p>
+                    <p className="text-gray-700 truncate">{user.address || "-"}</p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => openEditModal(user)}
+                    className="flex-1 flex items-center justify-center gap-2 p-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium"
+                  >
+                    <Pencil size={14} /> Edit
+                  </button>
+
+                  {user.role !== 'SuperAdmin' && (
+                    <>
+                      <button
+                        onClick={() => handleRoleUpdate(user.$id, user.role, user.name)}
+                        disabled={updateRole.isPending}
+                        className={`flex-1 flex items-center justify-center gap-2 p-2 rounded-lg text-sm font-medium ${user.role === 'NurseryAdmin'
+                          ? 'bg-orange-50 text-orange-600'
+                          : 'bg-green-50 text-green-600'
+                          }`}
+                      >
+                        {user.role === 'NurseryAdmin' ? <ShieldAlert size={14} /> : <Shield size={14} />}
+                        {user.role === 'NurseryAdmin' ? "Demote" : "Promote"}
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(user.$id, user.name)}
+                        disabled={deleteUser.isPending}
+                        className="flex items-center justify-center p-2 bg-red-50 text-red-600 rounded-lg"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredUsers.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              No users found matching your search.
+            </div>
+          )}
         </CardContent>
       </Card>
 

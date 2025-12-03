@@ -7,12 +7,16 @@ import { useNurseryOrders } from "@/hooks/lib/UseOrders";
 import { useAllProducts } from "@/hooks/lib/UseProduct";
 import { useMyNursery } from "@/hooks/lib/UseNursery";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+  ShoppingBag,
+  Package,
+  TrendingUp,
+  AlertTriangle,
+  Loader2,
+  DollarSign,
+  ChevronRight,
+  Store
+} from "lucide-react";
+import Link from "next/link";
 
 export default function NurseryAdminDashboard() {
   const { user, loading } = useAuth();
@@ -68,7 +72,7 @@ export default function NurseryAdminDashboard() {
 
   if (nurseryLoading || ordersLoading || productsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="animate-spin text-green-600" size={48} />
       </div>
     );
@@ -83,72 +87,113 @@ export default function NurseryAdminDashboard() {
     )
   }
 
+  const stats = [
+    {
+      name: "Total Revenue",
+      value: `₹${totalRevenue.toLocaleString()}`,
+      icon: DollarSign,
+      color: "bg-green-500",
+    },
+    {
+      name: "Total Orders",
+      value: totalOrders,
+      icon: ShoppingBag,
+      color: "bg-blue-500",
+    },
+    {
+      name: "Total Products",
+      value: totalProducts,
+      icon: Package,
+      color: "bg-purple-500",
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold mb-4 text-gray-800">🌱 {nursery.name || "Nursery"} Dashboard</h1>
+    <div className="space-y-8">
+      {/* Welcome Section */}
+      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Welcome back, {user?.name || "Nursery Admin"}! 🌿
+        </h1>
+        <p className="text-gray-500">
+          Here's what's happening with <span className="font-semibold text-green-600">{nursery.name}</span> today.
+        </p>
+      </div>
 
-      {/* ======================
-            TOP METRIC CARDS
-      ======================= */}
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg border-none">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-green-100 font-medium text-sm uppercase tracking-wider">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">₹{totalRevenue.toLocaleString()}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white shadow-md border-l-4 border-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-gray-500 font-medium text-sm uppercase tracking-wider">Total Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-gray-800">{totalOrders}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white shadow-md border-l-4 border-purple-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-gray-500 font-medium text-sm uppercase tracking-wider">Total Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold text-gray-800">{totalProducts}</p>
-          </CardContent>
-        </Card>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={stat.name}
+              className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-xl ${stat.color} bg-opacity-10`}>
+                  <Icon className={`w-6 h-6 ${stat.color.replace("bg-", "text-")}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.name}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* ======================
-              RECENT ORDERS
-        ======================= */}
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-xl text-gray-800">🛒 Recent Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Recent Orders */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-green-600" />
+              Recent Orders
+            </h2>
+            <Link
+              href="/nurseryadmin/orders"
+              className="text-sm font-medium text-green-600 hover:text-green-700 flex items-center gap-1"
+            >
+              View All <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="p-6">
             {ordersData?.documents.length === 0 ? (
-              <p className="text-gray-500 italic">No orders yet.</p>
+              <div className="text-center py-8 text-gray-500">
+                <ShoppingBag className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No orders yet</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {ordersData?.documents.slice(0, 5).map((order) => (
                   <div
                     key={order.$id}
-                    className="p-4 rounded-xl border border-gray-100 flex justify-between items-center bg-gray-50 hover:bg-white hover:shadow-sm transition-all"
+                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-green-50 transition-colors group"
                   >
-                    <div>
-                      <p className="font-bold text-gray-800">{order.customerName || "Guest"}</p>
-                      <p className="text-xs text-gray-500">Order #{order.orderNumber || order.$id.substring(0, 8)}</p>
-                      <p className="text-xs text-gray-400">{new Date(order.$createdAt).toLocaleDateString()}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-lg shadow-sm">
+                        🛒
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">
+                          {order.customerName || "Guest"}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          #{order.orderNumber || order.$id.substring(0, 8)}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
-                      <span className="block font-bold text-green-700 text-lg">
-                        ₹{order.totalAmount}
-                      </span>
-                      <span className={`text-[10px] px-2 py-1 rounded-full uppercase font-bold ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>
+                      <p className="font-bold text-gray-900">₹{order.totalAmount}</p>
+                      <span
+                        className={`inline-block px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${order.status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : order.status === "completed"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-700"
+                          }`}
+                      >
                         {order.status}
                       </span>
                     </div>
@@ -156,52 +201,78 @@ export default function NurseryAdminDashboard() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* ======================
-              INVENTORY STATUS
-        ======================= */}
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle className="text-xl text-gray-800">📦 Inventory Levels</CardTitle>
-          </CardHeader>
-
-          <CardContent className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {/* Inventory Status */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <Package className="w-5 h-5 text-purple-600" />
+              Inventory Status
+            </h2>
+            <Link
+              href="/nurseryadmin/inventory"
+              className="text-sm font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1"
+            >
+              Manage <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="p-6">
             {inventory.length === 0 ? (
-              <p className="text-gray-500 italic">No products found.</p>
+              <div className="text-center py-8 text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No products in inventory</p>
+              </div>
             ) : (
-              inventory.map((item) => (
-                <div
-                  key={item.name}
-                  className="p-3 border-b border-gray-100 flex justify-between items-center last:border-0"
-                >
-                  <p className="font-medium text-gray-700">{item.name}</p>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${item.stock < 10 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
-                    }`}>
-                    {item.stock} in stock
-                  </span>
-                </div>
-              ))
-            )}
+              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                {inventory.slice(0, 6).map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between p-3 border-b border-gray-50 last:border-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${item.stock < 10 ? "bg-red-500" : "bg-green-500"}`} />
+                      <p className="font-medium text-gray-700 truncate max-w-[150px] sm:max-w-[200px]">
+                        {item.name}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${item.stock < 10
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
+                        }`}
+                    >
+                      {item.stock} in stock
+                    </span>
+                  </div>
+                ))}
 
-            {lowStock.length > 0 && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-xl mt-6">
-                <h4 className="font-bold text-red-700 mb-3 flex items-center gap-2">
-                  ⚠ Low Stock Alert
-                </h4>
-                <div className="space-y-1">
-                  {lowStock.map((p) => (
-                    <p key={p.name} className="text-sm text-red-600 flex justify-between">
-                      <span>{p.name}</span>
-                      <span className="font-bold">{p.stock} left</span>
-                    </p>
-                  ))}
-                </div>
+                {lowStock.length > 0 && (
+                  <div className="mt-4 p-4 bg-red-50 rounded-xl border border-red-100">
+                    <h4 className="font-bold text-red-700 mb-2 flex items-center gap-2 text-sm">
+                      <AlertTriangle className="w-4 h-4" />
+                      Low Stock Alert ({lowStock.length})
+                    </h4>
+                    <div className="space-y-1">
+                      {lowStock.slice(0, 3).map((p) => (
+                        <div key={p.name} className="flex justify-between text-xs text-red-600">
+                          <span>{p.name}</span>
+                          <span className="font-bold">{p.stock} left</span>
+                        </div>
+                      ))}
+                      {lowStock.length > 3 && (
+                        <p className="text-xs text-red-500 mt-1 italic">
+                          + {lowStock.length - 3} more items
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

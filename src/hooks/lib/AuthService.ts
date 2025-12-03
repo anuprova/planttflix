@@ -1,5 +1,5 @@
 // src/services/authService.ts
-import { account, storage, ID, tableDb } from "@/lib/Appwrite.config";
+import { account, storage, ID, tableDb, BUCKET_ID } from "@/lib/Appwrite.config";
 
 export type SignupData = {
   name: string;
@@ -38,7 +38,28 @@ export async function signupService(formData: SignupData, image?: File | null) {
   // 1) create account (Appwrite will handle password)
   const acc = await account.create(ID.unique(), formData.email, formData.password, formData.name);
 
-  // 2) create profile row (do NOT store password in production!)
+  // 2) Upload image to storage if provided
+  let imageUrl = "";
+  if (image) {
+    try {
+      const fileId = ID.unique();
+      const uploadedFile = await storage.createFile(
+        BUCKET_ID, // Use the exported BUCKET_ID from config
+        fileId,
+        image
+      );
+      
+      // Get the file URL
+      imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${uploadedFile.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
+      
+      console.log("Image uploaded successfully:", imageUrl);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // Continue with signup even if image upload fails
+    }
+  }
+
+  // 3) create profile row with image URL
   const rowResponse = await tableDb.createRow({
     databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID as string,
     tableId: "Authenticationtable",
@@ -49,6 +70,7 @@ export async function signupService(formData: SignupData, image?: File | null) {
       password: formData.password,
       phone: formData.phone || "",
       role: formData.role || "User",
+      profileImage: imageUrl, // Save the image URL to profileImage field
     },
   });
 

@@ -51,7 +51,10 @@ export function useLogin() {
 
       // 1) Get logged in Appwrite account
       const accountData = await getAccount();
-      if (!accountData) return router.push("/login");
+      if (!accountData) {
+        window.location.href = "/login";
+        return;
+      }
 
       // 2) Fetch user's role from your Authenticationtable
       const profile = await tableDb.listRows({
@@ -68,12 +71,14 @@ export function useLogin() {
       console.log({role});
       
 
-      // 3) Redirect by role
-      if (role === "superadmin")
-        router.push("/superadmin");
-      else if (role === "nurseryadmin")
-        router.push("/nurseryadmin");
-      else router.push("/user/dashboard");
+      // 3) Hard redirect by role (ensures cookies are set before middleware runs)
+      if (role === "superadmin") {
+        window.location.href = "/superadmin";
+      } else if (role === "nurseryadmin") {
+        window.location.href = "/nurseryadmin";
+      } else {
+        window.location.href = "/user/dashboard";
+      }
     },
   });
 }

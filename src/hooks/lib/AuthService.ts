@@ -53,6 +53,14 @@ export async function loginService(email: string, password: string) {
   
   const session = await account.createEmailPasswordSession(email, password);
   
+  // Cookie options for production (Vercel HTTPS)
+  const cookieOptions = {
+    expires: 7,
+    secure: true, // Required for HTTPS (production)
+    sameSite: 'lax' as const, // Prevents CSRF attacks
+    path: '/', // Available across entire site
+  };
+  
   // Fetch user role from database
   try {
     const profile = await tableDb.listRows({
@@ -63,18 +71,18 @@ export async function loginService(email: string, password: string) {
     
     const role = profile?.rows?.[0]?.role || "User";
     
-    // Set all required cookies for middleware
-    Cookies.set(COOKIE_NAMES.loggedIn, "1", { expires: 7 });
-    Cookies.set(COOKIE_NAMES.session, session.$id, { expires: 7 });
-    Cookies.set(COOKIE_NAMES.role, role, { expires: 7 });
+    // Set all required cookies for middleware with proper attributes
+    Cookies.set(COOKIE_NAMES.loggedIn, "1", cookieOptions);
+    Cookies.set(COOKIE_NAMES.session, session.$id, cookieOptions);
+    Cookies.set(COOKIE_NAMES.role, role, cookieOptions);
     
     console.log("Login cookies set - Role:", role, "Session:", session.$id);
   } catch (error) {
     console.error("Error fetching user role:", error);
     // Set default cookies even if role fetch fails
-    Cookies.set(COOKIE_NAMES.loggedIn, "1", { expires: 7 });
-    Cookies.set(COOKIE_NAMES.session, session.$id, { expires: 7 });
-    Cookies.set(COOKIE_NAMES.role, "User", { expires: 7 });
+    Cookies.set(COOKIE_NAMES.loggedIn, "1", cookieOptions);
+    Cookies.set(COOKIE_NAMES.session, session.$id, cookieOptions);
+    Cookies.set(COOKIE_NAMES.role, "User", cookieOptions);
   }
   
   return session;

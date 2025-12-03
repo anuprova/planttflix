@@ -2,98 +2,67 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  try {
-    const { pathname } = request.nextUrl;
-    
-    console.log(`[Middleware] Processing: ${pathname}`);
+  const { pathname } = request.nextUrl;
+  
+  // Skip middleware for static files, API routes, and public assets
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".") // files with extensions
+  ) {
+    return NextResponse.next();
+  }
 
-    // Get cookies
-    const token = request.cookies.get("app_session")?.value;
-    const role = request.cookies.get("role")?.value;
+  console.log(`[Middleware] Path: ${pathname}`);
 
-    console.log(`[Middleware] Token exists: ${!!token}, Role: ${role || "none"}`);
+  const token = request.cookies.get("app_session")?.value;
+  const role = request.cookies.get("role")?.value;
 
-    // Public routes that don't need any middleware checks
-    const publicRoutes = ["/", "/about", "/contact", "/shop"];
-    const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith("/shop/"));
-    
-    // Auth pages - special handling
-    const isAuthPage = pathname === "/login" || pathname === "/signup";
+  console.log(`[Middleware] Cookies - Token: ${!!token}, Role: ${role}`);
 
-    // Allow auth pages to complete their flow without interference
-    if (isAuthPage) {
-      // Only redirect if user is already logged in
-      if (token && role) {
-        console.log(`[Middleware] Logged in user accessing auth page, redirecting to dashboard`);
-        const dashboardPath = role?.toLowerCase() === "superadmin" 
-          ? "/superadmin" 
-          : role?.toLowerCase() === "nurseryadmin"
-          ? "/nurseryadmin"
-          : "/user/dashboard";
-        return NextResponse.redirect(new URL(dashboardPath, request.url));
-      }
-      // Let unauthenticated users access login/signup pages
-      console.log(`[Middleware] Allowing access to auth page`);
-      return NextResponse.next();
-    }
+  // Public routes - always allow
+  const publicPaths = ["/", "/about", "/contact", "/shop", "/login", "/signup"];
+  if (publicPaths.some(path => pathname === path || pathname.startsWith("/shop/"))) {
+    console.log(`[Middleware] Public path - allowing`);
+    return NextResponse.next();
+  }
 
-    // Allow public routes without any checks
-    if (isPublicRoute) {
-      console.log(`[Middleware] Public route, allowing access`);
-      return NextResponse.next();
-    }
-
-    // Protected routes for unauthenticated users
-    const protectedPaths = ["/user", "/superadmin", "/nurseryadmin"];
-    const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
-
-    if (isProtectedRoute && !token) {
-      console.log(`[Middleware] Unauthenticated access to protected route, redirecting to login`);
+  // Protected routes - require authentication
+  if (pathname.startsWith("/user") || pathname.startsWith("/superadmin") || pathname.startsWith("/nurseryadmin")) {
+    // No token? Redirect to login
+    if (!token) {
+      console.log(`[Middleware] No token - redirecting to login`);
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Role-based access control (only if user is authenticated)
-    if (token && role && isProtectedRoute) {
-      const normalizedRole = role.toLowerCase();
-      
-      // Superadmin routes
-      if (pathname.startsWith("/superadmin") && normalizedRole !== "superadmin") {
-        console.log(`[Middleware] Non-superadmin accessing superadmin route`);
-        return NextResponse.redirect(new URL("/", request.url));
-      }
-
-      // Nurseryadmin routes
-      if (pathname.startsWith("/nurseryadmin") && normalizedRole !== "nurseryadmin") {
-        console.log(`[Middleware] Non-nurseryadmin accessing nurseryadmin route`);
-        return NextResponse.redirect(new URL("/", request.url));
-      }
-
-      // User routes - allow all authenticated users
-      if (pathname.startsWith("/user") && !["user", "superadmin", "nurseryadmin"].includes(normalizedRole)) {
-        console.log(`[Middleware] Invalid role accessing user route`);
-        return NextResponse.redirect(new URL("/", request.url));
-      }
+    // Has token but no role? Allow (role might be set after middleware runs)
+    if (!role) {
+      console.log(`[Middleware] Token exists but no role - allowing`);
+      return NextResponse.next();
     }
 
-    console.log(`[Middleware] Request allowed`);
-    return NextResponse.next();
-  } catch (error) {
-    console.error("[Middleware] Error:", error);
-    // Allow request to continue even if middleware fails
+    // Role-based access
+    const normalizedRole = role.toLowerCase();
+    
+    if (pathname.startsWith("/superadmin") && normalizedRole !== "superadmin") {
+      console.log(`[Middleware] Wrong role for superadmin`);
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    if (pathname.startsWith("/nurseryadmin") && normalizedRole !== "nurseryadmin") {
+      console.log(`[Middleware] Wrong role for nurseryadmin`);
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    console.log(`[Middleware] Authenticated - allowing`);
     return NextResponse.next();
   }
+
+  // Default: allow
+  console.log(`[Middleware] Default - allowing`);
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, etc)
-     * - api routes
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$|api).*)",
-  ],
+  matcher: "/:path*",
 };

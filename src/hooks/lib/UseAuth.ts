@@ -71,7 +71,13 @@ export function useLogin() {
       console.log({role});
       
 
-      // 3) Hard redirect by role (ensures cookies are set before middleware runs)
+      // 3) Set cookies first
+      // (cookies are set in loginService)
+      
+      // 4) Small delay to ensure cookies are written before redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 5) Hard redirect by role (ensures cookies are set before middleware runs)
       if (role === "superadmin") {
         window.location.href = "/superadmin";
       } else if (role === "nurseryadmin") {

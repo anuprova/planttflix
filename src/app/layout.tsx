@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "Plantflix",
     images: [
       {
-        url: "https://drive.google.com/file/d/1TeXZ4AlI_e4sSnCbCU-ScXMeI9JF6bDs/view?usp=sharing",
+        url: "https://fra.cloud.appwrite.io/v1/storage/buckets/691def7e0017221d1bea/files/6931211b003ddaf54642/view?project=69156882003887d9925c&mode=admin",
         width: 1200,
         height: 630,
         alt: "Plantflix India – Buy Plants Online",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       "Buy fresh indoor & outdoor plants, pots, and gardening tools. Order online from top-rated nurseries across India.",
     images: [
       {
-        url: "https://drive.google.com/file/d/1TeXZ4AlI_e4sSnCbCU-ScXMeI9JF6bDs/view?usp=sharing",
+        url: "https://fra.cloud.appwrite.io/v1/storage/buckets/691def7e0017221d1bea/files/6931211b003ddaf54642/view?project=69156882003887d9925c&mode=admin",
         width: 1200,
         height: 630,
         alt: "Plantflix India – Buy Plants Online",
